@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    ============================================================================
+    Configuration du descripteur de déploiement web (web.xml)
+    ============================================================================
+    Ce fichier configure le conteneur de servlets (Tomcat) pour l'application DCMS.
+    
+    Éléments configurés :
+    - Nom et description de l'application
+    - Servlet Jersey (JAX-RS) pour les endpoints REST
+    - Mapping des URLs vers le servlet Jersey
+    - Page d'accueil par défaut
+    
+    Note : Les filtres (JWT, CORS) et le listener de contexte sont
+    configurés via les annotations @WebFilter et @WebListener
+    directement dans les classes Java (approche Java EE moderne).
+    ============================================================================
+-->
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+                             http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+         version="4.0">
+
+    <display-name>DCMS - Distributed Complaint Management System</display-name>
+    <description>
+        Système distribué de gestion des plaintes - Projet Master Java EE Groupe 10.
+        Architecture n-tiers avec JAX-RS, EJB simulé, JPA, JMS, JWT.
+    </description>
+
+    <!-- ================================================================== -->
+    <!-- Configuration du servlet Jersey (JAX-RS)                           -->
+    <!-- ================================================================== -->
+    <servlet>
+        <servlet-name>JerseyServlet</servlet-name>
+        <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
+
+        <!-- Package à scanner pour les endpoints REST et les providers -->
+        <init-param>
+            <param-name>jersey.config.server.provider.packages</param-name>
+            <param-value>com.dcms.rest,com.dcms.exception,com.dcms.config</param-value>
+        </init-param>
+
+        <!-- Enregistrement du module Jackson pour la sérialisation JSON -->
+        <init-param>
+            <param-name>jersey.config.server.provider.classnames</param-name>
+            <param-value>org.glassfish.jersey.jackson.JacksonFeature</param-value>
+        </init-param>
+
+        <!-- Chargement au démarrage (priorité 1) -->
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <!-- Mapping : toutes les URLs /api/* sont gérées par Jersey -->
+    <servlet-mapping>
+        <servlet-name>JerseyServlet</servlet-name>
+        <url-pattern>/api/*</url-pattern>
+    </servlet-mapping>
+
+    <!-- ================================================================== -->
+    <!-- Page d'accueil par défaut                                          -->
+    <!-- ================================================================== -->
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
+
+    <!-- ================================================================== -->
+    <!-- Configuration de l'encodage UTF-8                                  -->
+    <!-- ================================================================== -->
+    <request-character-encoding>UTF-8</request-character-encoding>
+    <response-character-encoding>UTF-8</response-character-encoding>
+
+</web-app>

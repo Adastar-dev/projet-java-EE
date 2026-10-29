@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    ============================================================================
+    Configuration JPA - persistence.xml
+    ============================================================================
+    Ce fichier configure l'unité de persistance JPA pour le projet DCMS.
+    
+    Points clés :
+    - Provider : Hibernate ORM (implémentation JPA de référence)
+    - DataSource : JNDI lookup vers la datasource configurée dans Tomcat
+    - Transaction : RESOURCE_LOCAL (géré par l'application sur Tomcat)
+    
+    Note sur JTA vs RESOURCE_LOCAL :
+    - JTA (Java Transaction API) : transactions gérées par le conteneur
+      → Nécessite un serveur d'application complet (WildFly, GlassFish)
+    - RESOURCE_LOCAL : transactions gérées par l'application
+      → Compatible avec Tomcat (conteneur de servlets léger)
+    
+    Pour un vrai serveur Java EE, on utiliserait :
+      <persistence-unit transaction-type="JTA">
+    
+    Dans notre cas académique avec Tomcat, on simule JTA via
+    des annotations @Transactional et la gestion manuelle des EntityManager.
+    ============================================================================
+-->
+<persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence
+                                 http://xmlns.jcp.org/xml/ns/persistence/persistence_2_2.xsd"
+             version="2.2">
+
+    <!--
+        Unité de persistance principale du projet DCMS.
+        Toutes les entités JPA sont enregistrées ici.
+    -->
+    <persistence-unit name="dcmsPU" transaction-type="RESOURCE_LOCAL">
+        
+        <!-- Provider JPA : Hibernate ORM -->
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+
+        <!-- Déclaration explicite des entités JPA -->
+        <class>com.dcms.entity.Role</class>
+        <class>com.dcms.entity.User</class>
+        <class>com.dcms.entity.Complaint</class>
+        <class>com.dcms.entity.ComplaintHistory</class>
+
+        <!-- Ne pas scanner automatiquement les classes non listées -->
+        <exclude-unlisted-classes>false</exclude-unlisted-classes>
+
+        <properties>
+            <!-- ============================================================ -->
+            <!-- Configuration de la connexion JDBC vers MySQL 8+             -->
+            <!-- ============================================================ -->
+            <property name="javax.persistence.jdbc.driver" 
+                      value="com.mysql.cj.jdbc.Driver"/>
+            <property name="javax.persistence.jdbc.url" 
+                      value="jdbc:mysql://localhost:3306/dcms_db?useSSL=false&amp;serverTimezone=UTC&amp;allowPublicKeyRetrieval=true&amp;characterEncoding=UTF-8"/>
+            <property name="javax.persistence.jdbc.user" 
+                      value="root"/>
+            <property name="javax.persistence.jdbc.password" 
+                      value=""/>
+
+            <!-- ============================================================ -->
+            <!-- Configuration Hibernate                                      -->
+            <!-- ============================================================ -->
+            
+            <!-- Dialecte MySQL 8 : génère du SQL optimisé pour MySQL 8+ -->
+            <property name="hibernate.dialect" 
+                      value="org.hibernate.dialect.MySQL8Dialect"/>
+
+            <!-- 
+                Stratégie DDL :
+                - validate : vérifie que le schéma correspond aux entités
+                - update   : met à jour le schéma automatiquement (dev)
+                - create   : recrée le schéma à chaque démarrage
+                - none     : aucune action DDL
+                
+                En développement : 'update' pour faciliter les itérations
+                En production : 'validate' ou 'none' (migrations manuelles)
+            -->
+            <property name="hibernate.hbm2ddl.auto" value="update"/>
+
+            <!-- Afficher les requêtes SQL dans la console (debug) -->
+            <property name="hibernate.show_sql" value="true"/>
+
+            <!-- Formater les requêtes SQL pour une meilleure lisibilité -->
+            <property name="hibernate.format_sql" value="true"/>
+
+            <!-- Ajouter des commentaires SQL pour tracer l'origine des requêtes -->
+            <property name="hibernate.use_sql_comments" value="true"/>
+
+            <!-- ============================================================ -->
+            <!-- Pool de connexions (C3P0 intégré à Hibernate)                -->
+            <!-- ============================================================ -->
+            <property name="hibernate.c3p0.min_size" value="5"/>
+            <property name="hibernate.c3p0.max_size" value="20"/>
+            <property name="hibernate.c3p0.timeout" value="300"/>
+            <property name="hibernate.c3p0.max_statements" value="50"/>
+
+            <!-- ============================================================ -->
+            <!-- Encodage et timezone                                         -->
+            <!-- ============================================================ -->
+            <property name="hibernate.connection.characterEncoding" value="UTF-8"/>
+            <property name="hibernate.connection.useUnicode" value="true"/>
+        </properties>
+    </persistence-unit>
+</persistence>

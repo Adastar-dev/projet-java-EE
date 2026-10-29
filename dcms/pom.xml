@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    ============================================================================
+    DCMS - Distributed Complaint Management System
+    ============================================================================
+    Projet académique Master - Java EE & Programmation Distribuée
+    Groupe 10
+    
+    Ce fichier Maven définit toutes les dépendances nécessaires au projet :
+    - Java EE 8 API (JAX-RS, EJB, JPA, JMS, JTA)
+    - Sécurité (JWT, BCrypt)
+    - Persistance (Hibernate, MySQL)
+    - Logging (SLF4J + Logback)
+    - Validation (Bean Validation)
+    - Tests (JUnit 5, Mockito)
+    ============================================================================
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.dcms</groupId>
+    <artifactId>dcms</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>war</packaging>
+
+    <name>DCMS - Distributed Complaint Management System</name>
+    <description>
+        Système distribué de gestion des plaintes - Projet Master Java EE.
+        Architecture n-tiers avec JAX-RS, EJB, JPA, JMS, JTA.
+    </description>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+        <javaee.version>8.0.1</javaee.version>
+        <hibernate.version>5.6.15.Final</hibernate.version>
+        <mysql.version>8.0.33</mysql.version>
+        <jersey.version>2.35</jersey.version>
+        <jwt.version>0.11.5</jwt.version>
+        <bcrypt.version>0.10.2</bcrypt.version>
+        <slf4j.version>1.7.36</slf4j.version>
+        <logback.version>1.2.12</logback.version>
+        <junit.version>5.9.3</junit.version>
+        <mockito.version>5.3.1</mockito.version>
+        <jackson.version>2.15.2</jackson.version>
+        <activemq.version>5.17.6</activemq.version>
+    </properties>
+
+    <dependencies>
+        <!-- ================================================================ -->
+        <!-- JAVA EE 8 API - Fournit JAX-RS, EJB, JPA, JMS, JTA, CDI        -->
+        <!-- Scope 'provided' car le serveur d'application fournit ces APIs   -->
+        <!-- ================================================================ -->
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-api</artifactId>
+            <version>${javaee.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- ================================================================ -->
+        <!-- JAX-RS Implementation - Jersey (Reference Implementation)        -->
+        <!-- Utilisé pour exposer les endpoints REST                          -->
+        <!-- ================================================================ -->
+        <dependency>
+            <groupId>org.glassfish.jersey.containers</groupId>
+            <artifactId>jersey-container-servlet</artifactId>
+            <version>${jersey.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.inject</groupId>
+            <artifactId>jersey-hk2</artifactId>
+            <version>${jersey.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-json-jackson</artifactId>
+            <version>${jersey.version}</version>
+        </dependency>
+
+        <!-- ================================================================ -->
+        <!-- Jackson - Sérialisation/Désérialisation JSON                     -->
+        <!-- ================================================================ -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+
+        <!-- ================================================================ -->
+        <!-- JPA Implementation - Hibernate ORM                               -->
+        <!-- Fournit le mapping objet-relationnel vers MySQL                   -->
+        <!-- ================================================================ -->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <version>${hibernate.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <version>${hibernate.version}</version>
+        </dependency>
+
+        <!-- ================================================================ -->
+        <!-- MySQL Connector - Driver JDBC pour MySQL 8+                      -->
+        <!-- ================================================================ -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>${mysql.version}</version>
+        </dependency>
+
+        <!-- ================================================================ -->
+        <!-- JMS Implementation - Apache ActiveMQ                             -->
+        <!-- Fournit le broker de messages pour la communication asynchrone    -->
+        <!-- ================================================================ -->
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-client</artifactId>
+            <version>${activemq.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-broker</artifactId>
+            <version>${activemq.version}</version>
+        </dependency>
+
+        <!-- ================================================================ -->
+        <!-- Sécurité - JWT (JSON Web Token)                                  -->
+        <!-- Utilisé pour l'authentification stateless via tokens signés       -->
+        <!-- Algorithme : HS256 (HMAC-SHA256)                                 -->
+        <!-- ================================================================ -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>${jwt.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>${jwt.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>${jwt.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- ================================================================ -->
+        <!-- Sécurité - BCrypt                                                -->
+        <!-- Hashage sécurisé des mots de passe avec salt automatique         -->
+        <!-- ================================================================ -->
+        <dependency>
+            <groupId>at.favre.lib</groupId>
+            <artifactId>bcrypt</artifactId>
+            <version>${bcrypt.version}</version>
+        </dependency>
+
+        <!-- ================================================================ -->
+        <!-- Logging - SLF4J + Logback                                        -->
+        <!-- Journalisation professionnelle et structurée                      -->
+        <!-- ================================================================ -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+
+        <!-- ================================================================ -->
+        <!-- Bean Validation - Hibernate Validator                            -->
+        <!-- Validation déclarative des entrées (@NotNull, @Size, etc.)       -->
+        <!-- ================================================================ -->
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>6.2.5.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.el</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+
+        <!-- ================================================================ -->
+        <!-- Tests - JUnit 5 + Mockito                                        -->
+        <!-- ================================================================ -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>dcms</finalName>
+        <plugins>
+            <!-- Compilateur Java 11 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <source>11</source>
+                    <target>11</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+
+            <!-- Plugin WAR - Packaging pour déploiement Tomcat -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.4.0</version>
+                <configuration>
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                </configuration>
+            </plugin>
+
+            <!-- Surefire - Exécution des tests JUnit 5 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.1.2</version>
+            </plugin>
+        </plugins>
+    </build>
+</project>

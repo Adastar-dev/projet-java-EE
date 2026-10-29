@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DCMS - Distributed Complaint Management System</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- ============================================================ -->
+    <!-- PAGE DE CONNEXION / INSCRIPTION                              -->
+    <!-- ============================================================ -->
+    <div id="auth-page" class="page active">
+        <div class="auth-container">
+            <div class="auth-header">
+                <h1>DCMS</h1>
+                <p>Distributed Complaint Management System</p>
+                <div class="tech-badges">
+                    <span class="badge">JAX-RS</span>
+                    <span class="badge">JPA</span>
+                    <span class="badge">JMS</span>
+                    <span class="badge">JWT</span>
+                    <span class="badge">BCrypt</span>
+                    <span class="badge">MySQL</span>
+                </div>
+            </div>
+
+            <!-- Formulaire de connexion -->
+            <div id="login-form" class="auth-form">
+                <h2>Connexion</h2>
+                <div class="form-group">
+                    <label for="login-username">Nom d'utilisateur</label>
+                    <input type="text" id="login-username" placeholder="Entrez votre nom d'utilisateur" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Mot de passe</label>
+                    <input type="password" id="login-password" placeholder="Entrez votre mot de passe" required>
+                </div>
+                <button id="btn-login" class="btn btn-primary btn-full" onclick="login()">Se connecter</button>
+                <p class="auth-switch">Pas encore de compte ? <a href="#" onclick="showRegister()">S'inscrire</a></p>
+            </div>
+
+            <!-- Formulaire d'inscription -->
+            <div id="register-form" class="auth-form hidden">
+                <h2>Inscription</h2>
+                <div class="form-group">
+                    <label for="reg-username">Nom d'utilisateur</label>
+                    <input type="text" id="reg-username" placeholder="Choisissez un nom d'utilisateur" required>
+                </div>
+                <div class="form-group">
+                    <label for="reg-email">Email</label>
+                    <input type="email" id="reg-email" placeholder="votre@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="reg-password">Mot de passe</label>
+                    <input type="password" id="reg-password" placeholder="Minimum 6 caracteres" required>
+                </div>
+                <div class="form-group">
+                    <label for="reg-role">Role</label>
+                    <select id="reg-role">
+                        <option value="USER">Utilisateur</option>
+                        <option value="AGENT">Agent</option>
+                        <option value="ADMIN">Administrateur</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary btn-full" onclick="register()">S'inscrire</button>
+                <p class="auth-switch">Deja un compte ? <a href="#" onclick="showLogin()">Se connecter</a></p>
+            </div>
+
+            <div id="auth-error" class="error-msg hidden"></div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- APPLICATION PRINCIPALE (apres connexion)                     -->
+    <!-- ============================================================ -->
+    <div id="app-page" class="page hidden">
+
+        <!-- Barre de navigation -->
+        <nav class="navbar">
+            <div class="nav-brand">
+                <h2>DCMS</h2>
+            </div>
+            <div class="nav-links">
+                <a href="#" class="nav-link active" onclick="showSection('dashboard')">Tableau de bord</a>
+                <a href="#" class="nav-link" onclick="showSection('my-complaints')">Mes plaintes</a>
+                <a href="#" class="nav-link admin-only" onclick="showSection('all-complaints')">Toutes les plaintes</a>
+                <a href="#" class="nav-link admin-only" onclick="showSection('history')">Historique</a>
+            </div>
+            <div class="nav-user">
+                <span id="nav-username"></span>
+                <span id="nav-role" class="role-badge"></span>
+                <button class="btn btn-sm btn-danger" onclick="logout()">Deconnexion</button>
+            </div>
+        </nav>
+
+        <!-- Contenu principal -->
+        <main class="main-content">
+
+            <!-- SECTION : Tableau de bord -->
+            <section id="section-dashboard" class="section active">
+                <div class="section-header">
+                    <h2>Tableau de bord</h2>
+                    <button class="btn btn-primary" onclick="openNewComplaintModal()">+ Nouvelle plainte</button>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card stat-total">
+                        <div class="stat-number" id="stat-total">0</div>
+                        <div class="stat-label">Total plaintes</div>
+                    </div>
+                    <div class="stat-card stat-new">
+                        <div class="stat-number" id="stat-new">0</div>
+                        <div class="stat-label">Nouvelles</div>
+                    </div>
+                    <div class="stat-card stat-progress">
+                        <div class="stat-number" id="stat-progress">0</div>
+                        <div class="stat-label">En cours</div>
+                    </div>
+                    <div class="stat-card stat-resolved">
+                        <div class="stat-number" id="stat-resolved">0</div>
+                        <div class="stat-label">Resolues</div>
+                    </div>
+                </div>
+
+                <div class="recent-section">
+                    <h3>Plaintes recentes</h3>
+                    <div id="recent-complaints" class="complaints-list">
+                        <p class="loading">Chargement...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION : Mes plaintes -->
+            <section id="section-my-complaints" class="section hidden">
+                <div class="section-header">
+                    <h2>Mes plaintes</h2>
+                    <button class="btn btn-primary" onclick="openNewComplaintModal()">+ Nouvelle plainte</button>
+                </div>
+                <div id="my-complaints-list" class="complaints-list">
+                    <p class="loading">Chargement...</p>
+                </div>
+            </section>
+
+            <!-- SECTION : Toutes les plaintes (ADMIN/AGENT) -->
+            <section id="section-all-complaints" class="section hidden">
+                <div class="section-header">
+                    <h2>Toutes les plaintes</h2>
+                    <div class="filter-bar">
+                        <select id="filter-status" onchange="filterByStatus()">
+                            <option value="">Tous les statuts</option>
+                            <option value="NOUVELLE">Nouvelle</option>
+                            <option value="EN_COURS">En cours</option>
+                            <option value="RESOLUE">Resolue</option>
+                            <option value="REJETEE">Rejetee</option>
+                            <option value="FERMEE">Fermee</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="all-complaints-list" class="complaints-list">
+                    <p class="loading">Chargement...</p>
+                </div>
+            </section>
+
+            <!-- SECTION : Historique (ADMIN/AGENT) -->
+            <section id="section-history" class="section hidden">
+                <div class="section-header">
+                    <h2>Historique des changements</h2>
+                </div>
+                <div id="history-list" class="history-list">
+                    <p class="loading">Chargement...</p>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- MODAL : Nouvelle plainte                                     -->
+    <!-- ============================================================ -->
+    <div id="modal-new-complaint" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Nouvelle plainte</h3>
+                <button class="modal-close" onclick="closeModal('modal-new-complaint')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="complaint-title">Titre</label>
+                    <input type="text" id="complaint-title" placeholder="Titre de la plainte" required>
+                </div>
+                <div class="form-group">
+                    <label for="complaint-desc">Description</label>
+                    <textarea id="complaint-desc" rows="5" placeholder="Decrivez votre probleme en detail..." required></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('modal-new-complaint')">Annuler</button>
+                <button class="btn btn-primary" onclick="createComplaint()">Soumettre</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- MODAL : Detail d'une plainte                                 -->
+    <!-- ============================================================ -->
+    <div id="modal-complaint-detail" class="modal hidden">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h3 id="detail-title">Detail de la plainte</h3>
+                <button class="modal-close" onclick="closeModal('modal-complaint-detail')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <span class="detail-label">ID</span>
+                        <span id="detail-id" class="detail-value"></span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Statut</span>
+                        <span id="detail-status" class="detail-value"></span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Creee par</span>
+                        <span id="detail-creator" class="detail-value"></span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Assignee a</span>
+                        <span id="detail-agent" class="detail-value"></span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Date de creation</span>
+                        <span id="detail-date" class="detail-value"></span>
+                    </div>
+                </div>
+                <div class="detail-description">
+                    <h4>Description</h4>
+                    <p id="detail-desc"></p>
+                </div>
+
+                <!-- Actions ADMIN/AGENT -->
+                <div id="detail-actions" class="detail-actions hidden">
+                    <h4>Actions</h4>
+                    <div class="action-row">
+                        <select id="action-status">
+                            <option value="">Changer le statut...</option>
+                            <option value="EN_COURS">En cours</option>
+                            <option value="RESOLUE">Resolue</option>
+                            <option value="REJETEE">Rejetee</option>
+                            <option value="FERMEE">Fermee</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="changeStatus()">Appliquer</button>
+                    </div>
+                    <div class="action-row admin-action">
+                        <input type="number" id="action-agent-id" placeholder="ID de l'agent">
+                        <button class="btn btn-secondary" onclick="assignAgent()">Assigner agent</button>
+                    </div>
+                    <div class="action-row admin-action">
+                        <button class="btn btn-danger" onclick="deleteComplaint()">Supprimer la plainte</button>
+                    </div>
+                </div>
+
+                <!-- Historique de la plainte -->
+                <div id="detail-history" class="detail-history">
+                    <h4>Historique</h4>
+                    <div id="detail-history-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- TOAST NOTIFICATION                                           -->
+    <!-- ============================================================ -->
+    <div id="toast" class="toast hidden">
+        <span id="toast-message"></span>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+
+</body>
+</html>

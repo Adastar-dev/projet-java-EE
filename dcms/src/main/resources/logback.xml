@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    ============================================================================
+    Configuration Logback (SLF4J)
+    ============================================================================
+    Logback est l'implémentation de référence de SLF4J (Simple Logging Facade).
+    
+    Niveaux de log (du plus verbeux au moins verbeux) :
+    - TRACE : détails très fins (rarement utilisé en production)
+    - DEBUG : informations de débogage
+    - INFO  : événements normaux de l'application
+    - WARN  : situations potentiellement problématiques
+    - ERROR : erreurs nécessitant une attention
+    
+    Configuration :
+    - Console : tous les logs de l'application (niveau DEBUG)
+    - Fichier : logs de l'application (niveau INFO, rotation quotidienne)
+    ============================================================================
+-->
+<configuration>
+
+    <!-- ================================================================== -->
+    <!-- Appender Console : affiche les logs dans la console                 -->
+    <!-- ================================================================== -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <!-- Format : date | niveau | thread | classe | message -->
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%level] [%thread] %logger{36} - %msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- ================================================================== -->
+    <!-- Appender Fichier : écrit les logs dans un fichier avec rotation     -->
+    <!-- ================================================================== -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/dcms.log</file>
+
+        <!-- Politique de rotation : un fichier par jour, conservation 30 jours -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/dcms.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>100MB</totalSizeCap>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%level] [%thread] %logger{50} - %msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- ================================================================== -->
+    <!-- Configuration des niveaux de log par package                        -->
+    <!-- ================================================================== -->
+
+    <!-- Logs de l'application DCMS : niveau DEBUG -->
+    <logger name="com.dcms" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <!-- Hibernate : niveau WARN (réduire le bruit) -->
+    <logger name="org.hibernate" level="WARN"/>
+
+    <!-- Hibernate SQL : niveau DEBUG pour voir les requêtes (dev uniquement) -->
+    <logger name="org.hibernate.SQL" level="DEBUG"/>
+
+    <!-- Jersey : niveau WARN -->
+    <logger name="org.glassfish.jersey" level="WARN"/>
+
+    <!-- ActiveMQ : niveau WARN -->
+    <logger name="org.apache.activemq" level="WARN"/>
+
+    <!-- ================================================================== -->
+    <!-- Logger racine : niveau INFO par défaut                              -->
+    <!-- ================================================================== -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+</configuration>
